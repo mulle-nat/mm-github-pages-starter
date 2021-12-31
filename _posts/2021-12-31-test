@@ -1,0 +1,70 @@
+Just testing some shit...
+
+``` bash
+print_commands()
+{
+   local show_all="${1:-NO}"
+
+   SHOWN_COMMANDS="\
+   init        : setup some initial patternfiles
+   clean       : remove cached patternfiles
+   list        : list files that match patternfiles (default)
+   filename    : find patternfile that matches a filename
+   patternfile : manage patternfiles"
+
+   HIDDEN_COMMANDS="\
+   libexec-dir : print path to mulle-match libexec
+   uname       : mulle-match's simplified uname(1)"
+
+
+   printf "%s\n" "${SHOWN_COMMANDS}"
+
+   if [ "${show_all}" != 'NO' ]
+   then
+      printf "%s\n" "${HIDDEN_COMMANDS}"
+   fi
+}
+```
+
+and 
+
+``` objective-c
+
+@implementation NSDictionary( PropertyList)
+
+//
+// this is sadly quite a different algorithm, then propertylist encoding.
+// Tries to stay as compatible as possible to what Apple does, though I
+// would code it differently...
+//
+- (NSString *) descriptionInStringsFileFormat
+{
+   NSMutableString   *s;
+   id                key, value;
+   NSArray           *keys;
+   NSString          *valueDescription;
+
+   s    = [NSMutableString string];
+   keys = [[self allKeys] sortedArrayUsingSelector:@selector( mulleCompareDescription:)];
+   for( key in keys)
+   {
+      value = [self objectForKey:key];
+      if( ! [value conformsToProtocol:@protocol( MulleObjCPropertyListPrinting)])
+         return( nil);
+      if( [value __isNSNull])
+         continue;
+      if( [value __isNSString])
+         valueDescription = [value mulleQuotedString];
+      else
+         valueDescription = [value description];  // sic will print unquoted ... compatible!
+
+      [s appendString:[[key description] mulleQuotedString]];
+      [s appendString:@" = "];
+      [s appendString:valueDescription];
+      [s appendString:@";\n"];
+   }
+
+   return( s);
+}
+@end
+```
